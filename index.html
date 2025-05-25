@@ -2,24 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Scarfy Detailing</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
+      background-color: black;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      background-color: black;
     }
 
+    /* Bubble Video Overlay */
+    #bubble-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    /* Website Content */
     #main-content {
       opacity: 0;
       transition: opacity 1s ease-in;
       position: relative;
       z-index: 1;
+      padding: 50px;
       text-align: center;
-      padding-top: 20vh;
       color: white;
     }
 
@@ -32,72 +45,41 @@
       max-width: 600px;
       margin: auto;
     }
-
-    canvas {
-      position: fixed !important;
-      top: 0;
-      left: 0;
-      z-index: 9999;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
 
+  <!-- Green Screen Bubble Video -->
+  <video id="bubble-video" autoplay muted playsinline>
+    <source src="bubbles.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Real Website Content -->
   <div id="main-content">
     <h1>Scarfy Detailing</h1>
     <p>High-quality mobile car detailing right in your driveway. Fast, affordable, and professional.</p>
   </div>
 
-  <script src="https://pixijs.download/release/pixi.min.js"></script>
   <script>
-    const app = new PIXI.Application({
-      width: window.innerWidth,
-      height: window.innerHeight,
-      transparent: true
-    });
-    document.body.appendChild(app.view);
+    const bubbleVideo = document.getElementById("bubble-video");
+    const mainContent = document.getElementById("main-content");
 
-    const bubbles = [];
-    const bubbleCount = 200;
+    bubbleVideo.onended = () => {
+      bubbleVideo.remove(); // remove green video
+      mainContent.style.opacity = 1; // fade in real site
+      document.body.style.overflow = "auto"; // allow scrolling
+    };
 
-    for (let i = 0; i < bubbleCount; i++) {
-      const graphics = new PIXI.Graphics();
-      const size = Math.random() * 40 + 20;
-
-      graphics.lineStyle(1, 0x3399ff, 0.4); // blue outline
-      graphics.beginFill(0xffffff, 0.08); // transparent white fill
-      graphics.drawCircle(0, 0, size / 2);
-      graphics.endFill();
-
-      const bubble = new PIXI.Sprite(app.renderer.generateTexture(graphics));
-      bubble.x = Math.random() * app.screen.width;
-      bubble.y = Math.random() * app.screen.height;
-      bubble.scale.set(1);
-      bubble.alpha = 1;
-
-      app.stage.addChild(bubble);
-      bubbles.push({ sprite: bubble, size });
-    }
-
-    let elapsed = 0;
-
-    app.ticker.add((delta) => {
-      elapsed += delta;
-
-      for (const obj of bubbles) {
-        const s = obj.sprite;
-        s.scale.x += 0.02;
-        s.scale.y += 0.02;
-        s.alpha -= 0.02;
+    // Optional: auto-reveal site if video is very short
+    setTimeout(() => {
+      if (mainContent.style.opacity === "0") {
+        bubbleVideo.remove();
+        mainContent.style.opacity = 1;
+        document.body.style.overflow = "auto";
       }
-
-      if (elapsed >= 90) { // ~1.5 seconds at 60fps
-        app.destroy(true, { children: true });
-        document.getElementById('main-content').style.opacity = 1;
-        document.body.style.overflow = 'auto';
-      }
-    });
+    }, 2000); // fallback timer (2 sec)
   </script>
+
 </body>
 </html>
