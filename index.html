@@ -9,42 +9,8 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: black;
-    }
-
-    #bubble-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 9999;
-      background-color: black;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
-    }
-
-    .bubble {
-      position: absolute;
-      border: 1px solid rgba(0, 128, 255, 0.3);
-      background-color: rgba(255, 255, 255, 0.08);
-      border-radius: 50%;
-      animation: pop 1.5s ease-out forwards;
-    }
-
-    @keyframes pop {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(2.5);
-        opacity: 0;
-      }
     }
 
     #main-content {
@@ -52,54 +18,86 @@
       transition: opacity 1s ease-in;
       position: relative;
       z-index: 1;
-      padding: 40px;
       text-align: center;
+      padding-top: 20vh;
       color: white;
     }
 
-    #main-content h1 {
+    h1 {
       font-size: 3rem;
     }
 
-    #main-content p {
+    p {
       font-size: 1.5rem;
       max-width: 600px;
       margin: auto;
+    }
+
+    canvas {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <div id="bubble-container"></div>
-
-  <main id="main-content">
+  <div id="main-content">
     <h1>Scarfy Detailing</h1>
     <p>High-quality mobile car detailing right in your driveway. Fast, affordable, and professional.</p>
-  </main>
+  </div>
 
+  <script src="https://pixijs.download/release/pixi.min.js"></script>
   <script>
-    const bubbleContainer = document.getElementById("bubble-container");
-    const mainContent = document.getElementById("main-content");
+    const app = new PIXI.Application({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      transparent: true
+    });
+    document.body.appendChild(app.view);
 
+    const bubbles = [];
     const bubbleCount = 200;
+
     for (let i = 0; i < bubbleCount; i++) {
-      const bubble = document.createElement("div");
-      const size = Math.random() * 40 + 20; // 20px to 60px
-      bubble.className = "bubble";
-      bubble.style.width = `${size}px`;
-      bubble.style.height = `${size}px`;
-      bubble.style.top = `${Math.random() * 100}vh`;
-      bubble.style.left = `${Math.random() * 100}vw`;
-      bubbleContainer.appendChild(bubble);
+      const graphics = new PIXI.Graphics();
+      const size = Math.random() * 40 + 20;
+
+      graphics.lineStyle(1, 0x3399ff, 0.4); // blue outline
+      graphics.beginFill(0xffffff, 0.08); // transparent white fill
+      graphics.drawCircle(0, 0, size / 2);
+      graphics.endFill();
+
+      const bubble = new PIXI.Sprite(app.renderer.generateTexture(graphics));
+      bubble.x = Math.random() * app.screen.width;
+      bubble.y = Math.random() * app.screen.height;
+      bubble.scale.set(1);
+      bubble.alpha = 1;
+
+      app.stage.addChild(bubble);
+      bubbles.push({ sprite: bubble, size });
     }
 
-    // Remove bubbles and reveal content
-    setTimeout(() => {
-      bubbleContainer.remove();
-      mainContent.style.opacity = 1;
-      document.body.style.overflow = 'auto';
-    }, 1500);
-  </script>
+    let elapsed = 0;
 
+    app.ticker.add((delta) => {
+      elapsed += delta;
+
+      for (const obj of bubbles) {
+        const s = obj.sprite;
+        s.scale.x += 0.02;
+        s.scale.y += 0.02;
+        s.alpha -= 0.02;
+      }
+
+      if (elapsed >= 90) { // ~1.5 seconds at 60fps
+        app.destroy(true, { children: true });
+        document.getElementById('main-content').style.opacity = 1;
+        document.body.style.overflow = 'auto';
+      }
+    });
+  </script>
 </body>
 </html>
