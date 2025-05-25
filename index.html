@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scarfy Detailing</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background-color: black;
+    }
+
+    #bubble-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background-color: black;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .bubble {
+      position: absolute;
+      border: 1px solid rgba(0, 128, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      animation: pop 1.5s ease-out forwards;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    #main-content {
+      opacity: 0;
+      transition: opacity 1s ease-in;
+      position: relative;
+      z-index: 1;
+      padding: 40px;
+      text-align: center;
+      color: white;
+    }
+
+    #main-content h1 {
+      font-size: 3rem;
+    }
+
+    #main-content p {
+      font-size: 1.5rem;
+      max-width: 600px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bubble-container"></div>
+
+  <main id="main-content">
+    <h1>Scarfy Detailing</h1>
+    <p>High-quality mobile car detailing right in your driveway. Fast, affordable, and professional.</p>
+  </main>
+
+  <script>
+    const bubbleContainer = document.getElementById("bubble-container");
+    const mainContent = document.getElementById("main-content");
+
+    const bubbleCount = 200;
+    for (let i = 0; i < bubbleCount; i++) {
+      const bubble = document.createElement("div");
+      const size = Math.random() * 40 + 20; // 20px to 60px
+      bubble.className = "bubble";
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+      bubble.style.top = `${Math.random() * 100}vh`;
+      bubble.style.left = `${Math.random() * 100}vw`;
+      bubbleContainer.appendChild(bubble);
+    }
+
+    // Remove bubbles and reveal content
+    setTimeout(() => {
+      bubbleContainer.remove();
+      mainContent.style.opacity = 1;
+      document.body.style.overflow = 'auto';
+    }, 1500);
+  </script>
+
+</body>
+</html>
